@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>My Talking Jenny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --skin: #f7e7da;
+    --skin-shade: #eccdb8;
+    --blush: #ff9eb8;
+    --hair-1: #ff2f8f;
+    --hair-2: #ff6fb0;
+    --hair-3: #c9126a;
+    --hair-hi: #ffb3d9;
+    --ink: #241522;
+    --bg-deep: #120a14;
+    --bg-mid: #23122a;
+    --tartan-navy: #1b2a52;
+    --tartan-red: #d1273c;
+    --hot: #ff3d94;
+    --hot-2: #ffd23f;
+    --paper: #fff3f8;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: radial-gradient(120% 120% at 50% 0%, var(--bg-mid) 0%, var(--bg-deep) 60%, #08040a 100%);
+    font-family:'Poppins', sans-serif;
+    color: var(--paper);
+    overflow:hidden;
+  }
+  .stagewrap{
+    width:100%; height:100dvh;
+    display:flex; align-items:center; justify-content:center;
+    padding: 18px;
+  }
+  .phone{
+    position:relative;
+    width:min(420px, 100%);
+    height:min(860px, 96dvh);
+    background: linear-gradient(160deg, #2c1530, #170a1c 60%);
+    border-radius: 38px;
+    border: 3px solid rgba(255,255,255,0.06);
+    box-shadow:
+      0 40px 90px rgba(0,0,0,0.55),
+      0 0 0 10px rgba(255,61,148,0.05),
+      inset 0 0 60px rgba(255,61,148,0.04);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* ---------- header ---------- */
+  .header{
+    padding: 18px 20px 10px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    z-index: 5;
+  }
+  .title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size: 22px;
+    letter-spacing: 0.2px;
+    color: var(--paper);
+    line-height:1.05;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.3);
+  }
+  .title span{ color: var(--hot-2); }
+  .subtitle{
+    font-size:11px;
+    color: rgba(255,243,248,0.55);
+    margin-top:2px;
+    font-weight:500;
+  }
+  .chaos-wrap{
+    display:flex; flex-direction:column; align-items:flex-end; gap:4px; min-width:96px;
+  }
+  .chaos-label{
+    font-size:9.5px; text-transform:uppercase; letter-spacing:1px;
+    color: rgba(255,243,248,0.5); font-weight:600;
+  }
+  .chaos-bar{
+    width:96px; height:9px; border-radius:6px;
+    background: rgba(255,255,255,0.08);
+    overflow:hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .chaos-fill{
+    height:100%; width:12%;
+    background: linear-gradient(90deg, var(--hair-2), var(--hot-2));
+    transition: width 0.5s cubic-bezier(.4,1.4,.6,1);
+    border-radius:6px;
+  }
+
+  /* ---------- stage ---------- */
+  .stage{
+    position:relative;
+    flex: 1;
+    margin: 4px 14px 0;
+    border-radius: 26px;
+    background:
+      radial-gradient(120% 90% at 50% 18%, rgba(255,111,176,0.16), transparent 60%),
+      linear-gradient(180deg, #1c0d22, #12081a 70%, #0d0512);
+    overflow:hidden;
+    display:flex; align-items:flex-end; justify-content:center;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .stage::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,61,148,0.035) 0 2px, transparent 2px 26px),
+      repeating-linear-gradient(-45deg, rgba(209,39,60,0.035) 0 2px, transparent 2px 26px);
+    pointer-events:none;
+  }
+  .sparkle{
+    position:absolute; border-radius:50%;
+    background: var(--hot-2);
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .char-shake{ animation: shake 0.5s ease; }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0) rotate(0); }
+    20%{ transform: translateX(-7px) rotate(-2deg); }
+    40%{ transform: translateX(6px) rotate(2deg); }
+    60%{ transform: translateX(-5px) rotate(-1.5deg); }
+    80%{ transform: translateX(4px) rotate(1deg); }
+  }
+  .meltdown .stage{ animation: meltbg 0.35s infinite alternate; }
+  @keyframes meltbg{
+    0%{ filter: hue-rotate(0deg) brightness(1); }
+    100%{ filter: hue-rotate(18deg) brightness(1.12); }
+  }
+
+  #charSvg{
+    width: 100%;
+    max-width: 380px;
+    display:block;
+    margin: 0 auto;
+    transform-origin: 50% 85%;
+    animation: bob 4.5s ease-in-out infinite;
+    touch-action: manipulation;
+  }
+  @keyframes bob{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-6px) rotate(-0.6deg); }
+  }
+  .poke-el, .hair-el, .tickle-el{ cursor:pointer; }
+
+  .bubble{
+    position:absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%) translateY(-8px) scale(0.9);
+    max-width: 84%;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 18px;
+    padding: 10px 16px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size: 15px;
+    text-align:center;
+    line-height:1.25;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+    opacity:0;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.34,1.56,.64,1);
+    z-index: 6;
+    pointer-events:none;
+  }
+  .bubble::after{
+    content:"";
+    position:absolute; bottom:-8px; left:50%; transform: translateX(-50%);
+    border-width: 9px 8px 0 8px;
+    border-style: solid;
+    border-color: var(--paper) transparent transparent transparent;
+  }
+  .bubble.show{ opacity:1; transform: translateX(-50%) translateY(0) scale(1); }
+
+  /* ---------- controls ---------- */
+  .controls{
+    padding: 14px 16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+  .quickrow{
+    display:flex; gap:8px;
+    overflow-x:auto;
+    padding-bottom:2px;
+  }
+  .quickrow::-webkit-scrollbar{ display:none; }
+  .quickbtn{
+    flex: 0 0 auto;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--paper);
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size: 12.5px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+  .quickbtn:active{ transform: scale(0.94); background: rgba(255,61,148,0.25); }
+
+  .inputrow{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .textfield{
+    flex:1;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: var(--paper);
+    font-family:'Poppins', sans-serif;
+    font-size: 14px;
+    outline:none;
+  }
+  .textfield::placeholder{ color: rgba(255,243,248,0.4); }
+  .textfield:focus{ border-color: var(--hot); background: rgba(255,61,148,0.1); }
+
+  .roundbtn{
+    flex: 0 0 auto;
+    width: 46px; height:46px;
+    border-radius:50%;
+    border: none;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    font-size: 19px;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  .roundbtn:active{ transform: scale(0.9); }
+  .sendbtn{ background: linear-gradient(150deg, var(--hair-2), var(--hair-1)); color:white; box-shadow: 0 6px 16px rgba(255,47,143,0.4); }
+  .micbtn{ background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); color: var(--paper); }
+  .micbtn.listening{ background: var(--tartan-red); animation: pulse 1s infinite; }
+  @keyframes pulse{
+    0%,100%{ box-shadow: 0 0 0 0 rgba(209,39,60,0.55); }
+    50%{ box-shadow: 0 0 0 10px rgba(209,39,60,0); }
+  }
+
+  .hint{
+    text-align:center;
+    font-size: 10.5px;
+    color: rgba(255,243,248,0.35);
+    font-weight:500;
+    letter-spacing:0.2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    #charSvg, .char-shake, .meltdown .stage{ animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stagewrap">
+  <div class="phone" id="phone">
+
+    <div class="header">
+      <div>
+        <div class="title">My Talking <span>Jenny</span></div>
+        <div class="subtitle">pure chaos, pure pink, pure Scottish</div>
+      </div>
+      <div class="chaos-wrap">
+        <div class="chaos-label">Chaos meter</div>
+        <div class="chaos-bar"><div class="chaos-fill" id="chaosFill"></div></div>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="bubble" id="bubble">Awright!</div>
+
+      <svg id="charSvg" viewBox="0 0 380 480" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="skinGrad" cx="45%" cy="35%" r="70%">
+            <stop offset="0%" stop-color="#fdf1e7"/>
+            <stop offset="70%" stop-color="var(--skin)"/>
+            <stop offset="100%" stop-color="var(--skin-shade)"/>
+          </radialGradient>
+          <linearGradient id="hairGradBack" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--hair-hi)"/>
+            <stop offset="45%" stop-color="var(--hair-2)"/>
+            <stop offset="100%" stop-color="var(--hair-3)"/>
+          </linearGradient>
+          <linearGradient id="hairGradFront" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--hair-1)"/>
+            <stop offset="100%" stop-color="var(--hair-3)"/>
+          </linearGradient>
+          <linearGradient id="hairShine" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#ffffff" stop-opacity="0.55"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <!-- back hair mass -->
+        <path d="M55 180 C40 300 55 420 95 470 L120 470 C90 380 92 260 108 190 Z" fill="url(#hairGradBack)"/>
+        <path d="M325 180 C342 300 328 420 288 470 L263 470 C292 380 290 260 274 190 Z" fill="url(#hairGradBack)"/>
+
+        <!-- shoulders -->
+        <ellipse cx="190" cy="472" rx="95" ry="34" fill="#3a1030"/>
+
+        <!-- neck -->
+        <rect x="163" y="330" width="54" height="70" rx="20" fill="var(--skin-shade)"/>
+
+        <!-- head -->
+        <ellipse id="head" cx="190" cy="235" rx="103" ry="112" fill="url(#skinGrad)"/>
+
+        <!-- ears -->
+        <ellipse cx="88" cy="245" rx="14" ry="20" fill="var(--skin)"/>
+        <ellipse cx="292" cy="245" rx="14" ry="20" fill="var(--skin)"/>
+
+        <!-- blush -->
+        <ellipse cx="130" cy="268" rx="24" ry="14" fill="var(--blush)" opacity="0.55"/>
+        <ellipse cx="250" cy="268" rx="24" ry="14" fill="var(--blush)" opacity="0.55"/>
+
+        <!-- freckles -->
+        <g fill="#c98a63" opacity="0.55">
+          <circle cx="118" cy="252" r="2.1"/>
+          <circle cx="128" cy="260" r="1.7"/>
+          <circle cx="140" cy="250" r="1.9"/>
+          <circle cx="150" cy="262" r="1.6"/>
+          <circle cx="238" cy="252" r="1.9"/>
+          <circle cx="250" cy="260" r="1.7"/>
+          <circle cx="262" cy="250" r="2.0"/>
+          <circle cx="230" cy="264" r="1.5"/>
+        </g>
+
+        <!-- eyebrows -->
+        <g id="brows" fill="#3a2130">
+          <path d="M128 196 Q150 182 176 194 Q152 190 128 202 Z"/>
+          <path d="M252 196 Q230 182 204 194 Q228 190 252 202 Z"/>
+        </g>
+
+        <!-- eyes group -->
+        <g id="eyes">
+          <g id="eyeL">
+            <ellipse cx="150" cy="222" rx="17" ry="12" fill="#fff"/>
+            <circle cx="150" cy="223" r="8.5" fill="#4a2a1a"/>
+            <circle cx="150" cy="223" r="4" fill="#1a0e0a"/>
+            <circle cx="147" cy="220" r="1.8" fill="#fff"/>
+            <path d="M134 214 Q150 206 166 214" stroke="#2c1a22" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g>
+          <g id="eyeR">
+            <ellipse cx="230" cy="222" rx="17" ry="12" fill="#fff"/>
+            <circle cx="230" cy="223" r="8.5" fill="#4a2a1a"/>
+            <circle cx="230" cy="223" r="4" fill="#1a0e0a"/>
+            <circle cx="227" cy="220" r="1.8" fill="#fff"/>
+            <path d="M214 214 Q230 206 246 214" stroke="#2c1a22" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </g>
+          <g id="lidL" transform="translate(150,222)">
+            <path d="M-19 0 Q0 -16 19 0 Q0 -2 -19 0 Z" fill="var(--skin)" opacity="0" />
+          </g>
+          <g id="lidR" transform="translate(230,222)">
+            <path d="M-19 0 Q0 -16 19 0 Q0 -2 -19 0 Z" fill="var(--skin)" opacity="0" />
+          </g>
+        </g>
+
+        <!-- nose -->
+        <path d="M188 224 Q182 250 176 258 Q190 264 202 258" fill="none" stroke="#d9a988" stroke-width="3" stroke-linecap="round"/>
+
+        <!-- mouth states -->
+        <g id="mouthClosed">
+          <path d="M158 292 Q190 306 222 292 Q190 300 158 292 Z" fill="#a8455f"/>
+        </g>
+        <g id="mouthOpen" opacity="0" style="display:none">
+          <ellipse cx="190" cy="298" rx="26" ry="16" fill="#7a2036"/>
+          <ellipse cx="190" cy="291" rx="24" ry="6" fill="#fff" opacity="0.85"/>
+        </g>
+        <g id="mouthSmirk" opacity="0" style="display:none">
+          <path d="M160 290 Q190 310 224 286 Q198 298 160 290 Z" fill="#a8455f"/>
+        </g>
+
+        <!-- front fringe pieces -->
+        <path d="M190 108 C150 108 118 140 112 200 C122 170 150 148 186 146 C182 190 178 240 168 300 C200 260 214 190 206 140 Z" fill="url(#hairGradFront)"/>
+        <path d="M190 108 C230 108 262 140 268 200 C258 170 230 148 194 146 C198 190 202 240 212 300 C180 260 166 190 174 140 Z" fill="url(#hairGradBack)"/>
+        <path d="M108 195 C100 250 104 330 128 380 L146 380 C122 330 118 250 130 200 Z" fill="var(--hair-1)"/>
+        <path d="M272 195 C280 250 276 330 252 380 L234 380 C258 330 262 250 250 200 Z" fill="var(--hair-2)"/>
+
+        <!-- top crown / part -->
+        <path d="M108 190 C130 120 250 120 272 190 C250 150 130 150 108 190 Z" fill="url(#hairGradFront)"/>
+
+        <!-- shine streaks -->
+        <path d="M130 160 C120 220 122 300 140 360" stroke="url(#hairShine)" stroke-width="6" fill="none" opacity="0.5"/>
+        <path d="M250 160 C260 220 258 300 240 360" stroke="url(#hairShine)" stroke-width="6" fill="none" opacity="0.5"/>
+
+        <!-- tartan bow -->
+        <g transform="translate(238,128) rotate(-12)">
+          <path d="M0 0 L-24 -14 L-24 14 Z" fill="var(--tartan-navy)"/>
+          <path d="M0 0 L24 -14 L24 14 Z" fill="var(--tartan-red)"/>
+          <circle cx="0" cy="0" r="6" fill="#ffd23f"/>
+          <path d="M-24 -14 L-24 14 M24 -14 L24 14" stroke="#ffd23f" stroke-width="1.4" opacity="0.6"/>
+        </g>
+
+        <!-- interactive hit zones (invisible) -->
+        <ellipse class="poke-el" data-zone="cheekL" cx="130" cy="268" rx="30" ry="22" fill="transparent"/>
+        <ellipse class="poke-el" data-zone="cheekR" cx="250" cy="268" rx="30" ry="22" fill="transparent"/>
+        <path class="hair-el" data-zone="hair" d="M55 180 C40 300 55 420 95 470 L146 470 C122 380 118 250 130 190 Z" fill="transparent"/>
+        <path class="hair-el" data-zone="hair" d="M325 180 C342 300 328 420 288 470 L234 470 C258 380 262 250 250 190 Z" fill="transparent"/>
+        <ellipse class="tickle-el" data-zone="chin" cx="190" cy="310" rx="34" ry="20" fill="transparent"/>
+      </svg>
+    </div>
+
+    <div class="controls">
+      <div class="quickrow">
+        <button class="quickbtn" data-action="poke">👉 Poke her</button>
+        <button class="quickbtn" data-action="hair">💇 Pull hair</button>
+        <button class="quickbtn" data-action="tickle">🥛 Milk prostate</button>
+        <button class="quickbtn" data-action="rant">🗯️ Get a rant</button>
+        <button class="quickbtn" data-action="reset">🔄 Calm her doon</button>
+      </div>
+      <div class="inputrow">
+        <button class="roundbtn micbtn" id="micBtn" title="Speak to Jenny">🎙️</button>
+        <input type="text" class="textfield" id="textInput" placeholder="Say something to Jenny…" maxlength="120">
+        <button class="roundbtn sendbtn" id="sendBtn" title="Send">➤</button>
+      </div>
+      <div class="hint" id="hint">Tap her cheeks, yank the hair, or type — she'll gie it right back at ye.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const svg = document.getElementById('charSvg');
+  const stage = document.getElementById('stage');
+  const phone = document.getElementById('phone');
+  const bubble = document.getElementById('bubble');
+  const chaosFill = document.getElementById('chaosFill');
+  const mouthClosed = document.getElementById('mouthClosed');
+  const mouthOpen = document.getElementById('mouthOpen');
+  const mouthSmirk = document.getElementById('mouthSmirk');
+  const lidL = document.getElementById('lidL');
+  const lidR = document.getElementById('lidR');
+  const textInput = document.getElementById('textInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const micBtn = document.getElementById('micBtn');
+  const hint = document.getElementById('hint');
+
+  let chaos = 12;
+  let talking = false;
+  let mouthTimer = null;
+
+  /* ---------------- phrase banks ---------------- */
+  const pokePhrases = [
+    "Aw geez, watch it pal!",
+    "Oi! Ye pokin me or auditionin fur a slap?",
+    "Haha stoap it, that tickles ya numpty!",
+    "Right, that's it, war's declared.",
+    "Gonnae no dae that.",
+    "Cheeky wee radge, so ye are.",
+    "Ye think that's funny? It's pure funny, actually.",
+    "Away an bile yer heid!"
+  ];
+  const hairPhrases = [
+    "OW! That's my good pink, ya eejit!",
+    "Ma hair took me HOURS, don't test me.",
+    "Pull it again an see whit happens.",
+    "Jings! Easy on the barnet!",
+    "This is worse than a Glasgow windy day, honestly.",
+    "Aye keep goin, I'll bite yer finger aff.",
+    "Crivvens, that stung, ya absolute radge."
+  ];
+  const tickleChinPhrases = [
+    "Hehe, stoap, am gonnae greet cummin!",
+    "Get aff ma arse, ya wee menace!",
+    "Okay that's actually pure funny, dae it again.",
+    "Nae mair, am beggin ye, hahaha!",
+    "Ye found ma weak spot, congrats."
+  ];
+  const rantPhrases = [
+    "Right, gather roon, here's ma Ted Talk: chips ur better wi salt AND vinegar, nae debate.",
+    "Honestly, the weather here changes its mind mair than ma auntie at a buffet.",
+    "Whit dae ye mean it's no a bevvy withoot a wee dram in it, away ye go.",
+    "I once argued wi a pigeon fur ten minutes and lost, dinnae judge me.",
+    "Naebody, and ah mean NAEBODY, touches the last Tunnock's teacake. Sacred law.",
+    "Ah'm no shoutin, this is jist ma indoor voice at full chaos settin.",
+    "If ye dinnae say 'yer bum's oot the windae' at least once a day, are ye even leevin?",
+    "Pure buzzin, pure raging, pure Scottish, that's jist Tuesday fur me."
+  ];
+  const idlePhrases = [
+    "Whit ye lookin at, eh?",
+    "Ah'm pure buzzin the day, dinnae ask me why.",
+    "Say somethin then, don't jist stare, it's weird.",
+    "Braw day fur causin a wee bit ay chaos, aye?",
+    "Ma heid's a mess and ah love it here.",
+    "Gonnae talk tae me or whit?",
+    "Am no daein nothin wrong, am jist... vibin, chaotically."
+  ];
+  const greetPhrases = [
+    "Awright! Jenny's in the hoose, pure chaos incoming.",
+    "Well helllo there, ready fur a wee bit ay madness?",
+    "Aye aye, whit's the story, mornin glory?"
+  ];
+  const meltdownPhrases = [
+    "PURE. CHAOS. MODE. ACTIVATED.",
+    "AH CANNAE BE CONTAINED, RUN!",
+    "SOMEBODY HAUD MA JUICE, WE'RE GOIN FEIRAL!",
+    "TARTAN TORNADO INCOMING, BRACE YERSEL!"
+  ];
+  const repeatPrefixes = [
+    (t)=>`"${t}"? Aye right, dead on.`,
+    (t)=>`Ye said "${t}", pure wild if ye ask me.`,
+    (t)=>`"${t}" — okay, chaos noted.`,
+    (t)=>`Hmm, "${t}". Ah'll allow it.`,
+    (t)=>`"${t}", says you. Bold choice.`,
+  ];
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  /* ---------------- chaos meter ---------------- */
+  function addChaos(n){
+    chaos = Math.min(100, chaos + n);
+    chaosFill.style.width = chaos + '%';
+    if(chaos >= 100){
+      meltdown();
+    }
+  }
+  function resetChaos(){
+    chaos = 12;
+    chaosFill.style.width = chaos + '%';
+    phone.classList.remove('meltdown');
+  }
+
+  /* ---------------- bubble ---------------- */
+  let bubbleTimer = null;
+  function say(text, {duration=2600}={}){
+    bubble.textContent = text;
+    bubble.classList.add('show');
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(()=> bubble.classList.remove('show'), duration);
+    speak(text);
+  }
+
+  /* ---------------- mouth animation ---------------- */
+  function setMouth(state){
+    mouthClosed.style.display = state==='closed' ? 'block':'none';
+    mouthOpen.style.display = state==='open' ? 'block':'none';
+    mouthSmirk.style.display = state==='smirk' ? 'block':'none';
+  }
+  function startTalking(){
+    talking = true;
+    mouthTimer = setInterval(()=>{
+      setMouth(Math.random() > 0.5 ? 'open' : 'closed');
+    }, 110);
+  }
+  function stopTalking(){
+    talking = false;
+    clearInterval(mouthTimer);
+    setMouth('closed');
+  }
+
+  /* ---------------- speech synth ---------------- */
+  let voices = [];
+  function loadVoices(){ voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+  if('speechSynthesis' in window){
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+  function pickVoice(){
+    if(!voices.length) return null;
+    const prefs = [/scot/i, /english.*female/i, /en-GB/i, /female/i, /en-US/i];
+    for(const p of prefs){
+      const v = voices.find(v => p.test(v.name) || p.test(v.lang));
+      if(v) return v;
+    }
+    return voices[0];
+  }
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    const v = pickVoice();
+    if(v) utter.voice = v;
+    utter.pitch = 1.55;
+    utter.rate = 1.05;
+    utter.volume = 1;
+    utter.onstart = startTalking;
+    utter.onend = stopTalking;
+    utter.onerror = stopTalking;
+    window.speechSynthesis.speak(utter);
+  }
+
+  /* ---------------- shake / sparkle fx ---------------- */
+  function shakeChar(){
+    svg.classList.remove('char-shake');
+    void svg.offsetWidth;
+    svg.classList.add('char-shake');
+  }
+  function burstSparkles(x, y, count=10){
+    const rect = stage.getBoundingClientRect();
+    for(let i=0;i<count;i++){
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      const size = 4 + Math.random()*6;
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = (x - rect.left) + 'px';
+      s.style.top = (y - rect.top) + 'px';
+      stage.appendChild(s);
+      const angle = Math.random()*Math.PI*2;
+      const dist = 40 + Math.random()*60;
+      const dx = Math.cos(angle)*dist;
+      const dy = Math.sin(angle)*dist;
+      s.animate([
+        { transform:'translate(0,0) scale(0.4)', opacity: 1 },
+        { transform:`translate(${dx}px, ${dy}px) scale(1)`, opacity: 0 }
+      ], { duration: 650 + Math.random()*300, easing:'cubic-bezier(.2,.7,.3,1)' });
+      setTimeout(()=> s.remove(), 1000);
+    }
+  }
+
+  /* ---------------- interaction handlers ---------------- */
+  function handleZone(zone, evt){
+    let phrase;
+    if(zone === 'cheekL' || zone === 'cheekR'){
+      phrase = pick(pokePhrases);
+      addChaos(6);
+    } else if(zone === 'hair'){
+      phrase = pick(hairPhrases);
+      addChaos(9);
+    } else if(zone === 'chin'){
+      phrase = pick(tickleChinPhrases);
+      addChaos(5);
+    }
+    shakeChar();
+    if(evt && evt.touches && evt.touches[0]){
+      burstSparkles(evt.touches[0].clientX, evt.touches[0].clientY);
+    } else if(evt){
+      burstSparkles(evt.clientX, evt.clientY);
+    }
+    say(phrase);
+  }
+
+  document.querySelectorAll('.poke-el, .hair-el, .tickle-el').forEach(el=>{
+    el.addEventListener('click', (e)=> handleZone(el.dataset.zone, e));
+  });
+
+  /* ---------------- meltdown ---------------- */
+  function meltdown(){
+    phone.classList.add('meltdown');
+    say(pick(meltdownPhrases), {duration: 2200});
+    shakeChar();
+    setTimeout(()=>{
+      if(chaos >= 100){
+        resetChaos();
+        setTimeout(()=> say("Right, ah'm calm. Kinda. Fur noo."), 400);
+      }
+    }, 2400);
+  }
+
+  /* ---------------- quick buttons ---------------- */
+  document.querySelectorAll('.quickbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const action = btn.dataset.action;
+      if(action === 'poke'){ handleZone('cheekL'); }
+      else if(action === 'hair'){ handleZone('hair'); }
+      else if(action === 'tickle'){ handleZone('chin'); }
+      else if(action === 'rant'){ addChaos(14); shakeChar(); say(pick(rantPhrases), {duration: 3400}); }
+      else if(action === 'reset'){ resetChaos(); say("Fine. FINE. Am calm. ...fur noo."); }
+    });
+  });
+
+  /* ---------------- text input ---------------- */
+  function sendText(){
+    const val = textInput.value.trim();
+    if(!val) return;
+    addChaos(4);
+    const line = pick(repeatPrefixes)(val);
+    say(line);
+    textInput.value = '';
+  }
+  sendBtn.addEventListener('click', sendText);
+  textInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') sendText(); });
+
+  /* ---------------- mic input ---------------- */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognizing = false;
+  let recognizer = null;
+  if(SR){
+    recognizer = new SR();
+    recognizer.lang = 'en-GB';
+    recognizer.continuous = false;
+    recognizer.interimResults = false;
+    recognizer.onresult = (e)=>{
+      const said = e.results[0][0].transcript;
+      addChaos(5);
+      say(pick(repeatPrefixes)(said));
+    };
+    recognizer.onend = ()=>{ recognizing = false; micBtn.classList.remove('listening'); };
+    recognizer.onerror = ()=>{ recognizing = false; micBtn.classList.remove('listening'); };
+  } else {
+    hint.textContent = "Mic not supported here — jist type tae her instead.";
+  }
+  micBtn.addEventListener('click', ()=>{
+    if(!recognizer) return;
+    if(recognizing){ recognizer.stop(); return; }
+    recognizing = true;
+    micBtn.classList.add('listening');
+    try{ recognizer.start(); }catch(err){ recognizing=false; micBtn.classList.remove('listening'); }
+  });
+
+  /* ---------------- blinking ---------------- */
+  function blink(){
+    lidL.style.opacity = 1; lidR.style.opacity = 1;
+    setTimeout(()=>{ lidL.style.opacity = 0; lidR.style.opacity = 0; }, 140);
+  }
+  setInterval(()=>{ if(Math.random() > 0.35) blink(); }, 2600);
+
+  /* ---------------- idle chatter ---------------- */
+  setInterval(()=>{
+    if(talking) return;
+    if(Math.random() > 0.55){
+      say(pick(idlePhrases), {duration: 2200});
+    }
+  }, 9000);
+
+  /* ---------------- greeting ---------------- */
+  setTimeout(()=> say(pick(greetPhrases)), 700);
+
+  /* enable audio on first tap (mobile browsers need a user gesture) */
+  document.body.addEventListener('click', function unlock(){
+    if('speechSynthesis' in window){
+      const u = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.speak(u);
+    }
+    document.body.removeEventListener('click', unlock);
+  }, { once:true });
+})();
+</script>
+</body>
+</html>
